@@ -76,10 +76,12 @@ https://github.com/Aniket25042003/MarketMinds/blob/master/MarketMinds.mp4
 ## License
 This project is open-source and available under the MIT License.
 
-## Author
-Aniket Patel
-Computer Science @ Ashland University
-LinkedIn | GitHub
+## 🙋‍♂️ Author
+**Aniket Patel**  
+Computer Science @ Ashland University  
+
+[LinkedIn](https://www.linkedin.com/in/aniketpatel2003/) | [GitHub](https://github.com/Aniket25042003)
+
 
 ## Tags
 AI Agents • Gemini LLM • CrewAI • Market Research • FastAPI • React • LangChain • Product Analytics
