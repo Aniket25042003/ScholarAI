@@ -86,7 +86,6 @@ def analyze_sentiment(market_data):
 
     # 6) Extract raw output and log
     raw = result.text if hasattr(result, "text") else str(result)
-    print("🤖 [SentimentAgent] raw LLM output:\n", raw)
 
     # 7) Isolate JSON block
     start = raw.find("{")
@@ -94,20 +93,14 @@ def analyze_sentiment(market_data):
     if start != -1 and end != -1 and end > start:
         json_blob = raw[start:end+1]
     else:
-        print("⚠️ [SentimentAgent] Could not find JSON braces; using entire output.")
         json_blob = raw
-
-    print("🔍 [SentimentAgent] JSON blob to parse:\n", json_blob)
 
     # 8) Parse JSON
     try:
         parsed = json.loads(json_blob)
         positive = parsed.get("positive", [])
         negative = parsed.get("negative", [])
-        print("✅ [SentimentAgent] Parsed positive:", positive)
-        print("✅ [SentimentAgent] Parsed negative:", negative)
     except Exception as e:
-        print("❌ [SentimentAgent] JSON parsing failed:", e)
         positive, negative = [], []
 
     return {"positive": positive, "negative": negative}

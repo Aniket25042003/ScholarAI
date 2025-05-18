@@ -60,20 +60,16 @@ def analyze_competitors(market_data, product_idea):
 
     # 5) Debug raw output
     raw = result.text if hasattr(result, "text") else str(result)
-    print("🤖 [CompetitorAgent] raw LLM output:\n", raw)
-
+    
     # 6) Extract JSON blob
     start, end = raw.find("{"), raw.rfind("}")
     blob = raw[start:end+1] if start != -1 and end != -1 else raw
-    print("🔍 [CompetitorAgent] JSON blob to parse:\n", blob)
 
     # 7) Parse JSON
     try:
         parsed = json.loads(blob)
         summary = parsed.get("summary", "").strip()
-        print("✅ [CompetitorAgent] Parsed summary:", summary)
     except Exception as e:
-        print("❌ [CompetitorAgent] JSON parsing failed:", e)
         summary = ""
 
     # 8) Attach to first competitor

@@ -68,7 +68,6 @@ def identify_opportunities(market_data, consumer_sentiment):
 
     # 5) Extract raw output and log for debugging
     raw = result.text if hasattr(result, "text") else str(result)
-    print("🤖 [OpportunityAgent] raw LLM output:\n", raw)
 
     # 6) Attempt to isolate the JSON block
     start = raw.find("{")
@@ -76,21 +75,14 @@ def identify_opportunities(market_data, consumer_sentiment):
     if start != -1 and end != -1 and end > start:
         json_blob = raw[start:end+1]
     else:
-        print("⚠️ [OpportunityAgent] Could not find JSON braces in output; using entire raw.")
         json_blob = raw
-
-    print("🔍 [OpportunityAgent] JSON blob to parse:\n", json_blob)
 
     # 7) Parse JSON
     try:
         parsed = json.loads(json_blob)
         gaps = parsed.get("gapAnalysis", [])
         rec = parsed.get("recommendationSummary", "")
-        print("✅ [OpportunityAgent] parsed JSON successfully:")
-        print("   gapAnalysis:", gaps)
-        print("   recommendationSummary:", rec)
     except Exception as e:
-        print("❌ [OpportunityAgent] JSON parsing failed:", e)
         gaps, rec = [], ""
 
     return gaps, rec
