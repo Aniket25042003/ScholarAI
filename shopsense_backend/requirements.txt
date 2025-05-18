@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+python-dotenv
+requests
+huggingface_hub
+transformers
+beautifulsoup4
