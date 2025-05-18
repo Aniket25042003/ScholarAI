@@ -5,3 +5,6 @@ requests
 huggingface_hub
 transformers
 beautifulsoup4
+crewai
+numpy
+pandas
