@@ -71,7 +71,7 @@ uvicorn main:app --reload
 ```
 
 ## Demo
-https://github.com/Aniket25042003/MarketMinds/blob/master/MarketMinds.mp4
+https://drive.google.com/file/d/14hr-pNckJuonnD9jCAgYL5rkhO2PQ9Wk/view?usp=sharing
 
 ## License
 This project is open-source and available under the MIT License.
