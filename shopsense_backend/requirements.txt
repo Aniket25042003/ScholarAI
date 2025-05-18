@@ -12,3 +12,4 @@ crewai_tools==0.45.0
 sentence-transformers
 chromadb==0.5.23
 langchain_huggingface
+uvicorn[standard]
