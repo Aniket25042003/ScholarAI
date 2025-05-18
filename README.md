@@ -64,9 +64,11 @@ npm run dev
 ```
 
 #### Backend
+```bash
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload
+```
 
 ## Demo
 https://github.com/Aniket25042003/MarketMinds/blob/master/MarketMinds.mp4
