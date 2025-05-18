@@ -37,7 +37,7 @@ MarketMinds uses **CrewAI Tools** to coordinate multiple autonomous AI agents, e
 
 ### 🧠 LLM Backend
 
-These agents are powered by **Google's Gemini model**, which enables contextual reasoning, summarization, and strategy generation.
+These agents are powered by **Google's Gemini model**, which enables contextual reasoning, context understanding, and strategy generation.
 
 ---
 
