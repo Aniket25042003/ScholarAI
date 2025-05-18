@@ -8,3 +8,4 @@ beautifulsoup4
 crewai
 numpy
 pandas
+crewai_tools
