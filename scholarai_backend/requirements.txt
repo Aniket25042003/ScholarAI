@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+python-dotenv
+requests
+huggingface_hub
+transformers
+beautifulsoup4
+crewai
+numpy
+pandas
+crewai_tools==0.45.0
+sentence-transformers
+chromadb==0.5.23
+langchain_huggingface
+uvicorn[standard]

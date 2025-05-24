@@ -1,9 +1,5 @@
-import DashboardPage from '../components/DashboardPage';
+import DashboardPage from "../components/DashboardPage";
 
-const Dashboard = ({ user }) => {
-  return (
-    <DashboardPage user={user} />
-  );
-};
-
-export default Dashboard;
+export default function Dashboard({ user }) {
+  return <DashboardPage user={user} />;
+}

@@ -1,3 +1,4 @@
+/* index.css */
 @import 'tailwindcss';
 
 html,
@@ -31,13 +32,41 @@ select {
   animation: fadeIn 0.5s ease-in-out;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px);}
-  to { opacity: 1; transform: translateY(0);}
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+
 .animate-bounce {
   animation: bounce 0.9s cubic-bezier(0.4,0,0.2,1) 1;
 }
 @keyframes bounce {
-  0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1);}
-  50% { transform: translateY(0); animation-timing-function: cubic-bezier(0,0,0.2,1);}
+  0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+  50%      { transform: translateY(0);    animation-timing-function: cubic-bezier(0,0,0.2,1); }
+}
+
+/* Markdown styling without tailwind.config.js */
+.markdown h1 {
+  @apply text-2xl font-bold mt-4 mb-2;
+}
+.markdown h2 {
+  @apply text-xl font-semibold mt-4 mb-2;
+}
+.markdown h3 {
+  @apply text-lg font-semibold mt-3 mb-1;
+}
+.markdown p {
+  @apply mb-4 leading-relaxed;
+}
+.markdown ul,
+.markdown ol {
+  @apply list-inside list-disc mb-4 ml-4;
+}
+.markdown li {
+  @apply mb-1;
+}
+.markdown pre {
+  @apply bg-gray-100 p-4 rounded overflow-auto mb-4;
+}
+.markdown code {
+  @apply bg-gray-100 px-1 rounded text-sm font-mono;
 }

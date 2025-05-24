@@ -1,104 +1,251 @@
-import { useState } from "react";
-import { Brain, Zap, AlertCircle } from "lucide-react";
-import ReportSection from "./ReportSection";
+import { useState, useMemo } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import {
+  Brain,
+  Zap,
+  AlertCircle,
+  MessageCircle,
+  ClipboardCopy,
+  DownloadCloud,
+} from "lucide-react";
 
-// Optionally: Move this into src/utils/api.js
-async function fetchMarketResearch(productIdea) {
-  const response = await fetch("http://localhost:8000/api/research", {
+const BASE_URL = "http://localhost:8000";
+
+async function fetchReport(topic) {
+  const res = await fetch(`${BASE_URL}/api/research`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ product_idea: productIdea }),
+    body: JSON.stringify({ topic, num_papers: 3, citation_style: "APA" }),
   });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.detail || "Failed to fetch research");
+  if (!res.ok) {
+    const { detail } = await res.json();
+    throw new Error(detail || "Failed to fetch report");
   }
-
-  return await response.json();
+  return res.json();
 }
 
-const DashboardPage = ({ user }) => {
-  const [productIdea, setProductIdea] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [report, setReport] = useState(null);
-  const [error, setError] = useState('');
+async function postChat(question) {
+  const res = await fetch(`${BASE_URL}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question }),
+  });
+  if (!res.ok) {
+    const { detail } = await res.json();
+    throw new Error(detail || "Chat error");
+  }
+  return res.json();
+}
 
-  const handleGenerateReport = async () => {
-    if (!productIdea.trim()) {
-      setError("Please enter a product idea or category.");
-      setReport(null);
+export default function DashboardPage({ user }) {
+  // Research
+  const [topic, setTopic] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [reportMd, setReportMd] = useState("");
+  const [error, setError] = useState("");
+
+  // Chat
+  const [chatEnabled, setChatEnabled] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLog, setChatLog] = useState([]);
+
+  // Word count & read time
+  const { wordCount, readTime } = useMemo(() => {
+    if (!reportMd) return { wordCount: 0, readTime: 0 };
+    const words = reportMd.trim().split(/\s+/).length;
+    return { wordCount: words, readTime: Math.max(1, Math.ceil(words / 200)) };
+  }, [reportMd]);
+
+  const handleFetch = async () => {
+    if (!topic.trim()) {
+      setError("Please enter a research topic.");
       return;
     }
-    setError('');
+    setError("");
     setIsLoading(true);
-    setReport(null);
+    setReportMd("");
+    setChatEnabled(false);
 
     try {
-      const data = await fetchMarketResearch(productIdea);
-      setReport(data);
-    } catch (err) {
-      setError(err.message || "An error occurred.");
+      const { researchReport } = await fetchReport(topic);
+      setReportMd(researchReport);
+      setChatEnabled(true);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    setIsLoading(false);
+  const handleChat = async () => {
+    if (!chatInput.trim()) return;
+    const q = chatInput;
+    setChatInput("");
+    setChatLog((log) => [...log, { question: q, answer: "...thinking..." }]);
+    try {
+      const { reply } = await postChat(q);
+      setChatLog((log) =>
+        log.map((e) =>
+          e.answer === "...thinking..." ? { ...e, answer: reply } : e
+        )
+      );
+    } catch (e) {
+      setChatLog((log) =>
+        log.map((entry) =>
+          entry.answer === "...thinking..."
+            ? { ...entry, answer: `Error: ${e.message}` }
+            : entry
+        )
+      );
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(reportMd);
+  };
+  const handleDownload = () => {
+    const blob = new Blob([reportMd], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${topic.trim().replace(/\s+/g, "_")}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <header className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-800">Market Research Dashboard</h2>
-        {user && <p className="text-gray-600">Welcome back, {user.name || user.email}!</p>}
-      </header>
+    <div className="flex h-full min-h-screen bg-gradient-to-r from-purple-950 via-indigo-900 to-indigo-800">
+      <main className="flex-1 p-6 space-y-8">
+        {/* Header */}
+        <header>
+          <h1 className="text-3xl font-bold text-violet-100 drop-shadow">
+            Academic Research Dashboard
+          </h1>
+          {user && (
+            <p className="text-violet-400">
+              Welcome back, {user.displayName || user.email}!
+            </p>
+          )}
+        </header>
 
-      {/* Input Section */}
-      <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
-        <h3 className="text-xl font-semibold text-gray-700 mb-4">Analyze a Product Idea</h3>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <input
-            type="text"
-            value={productIdea}
-            onChange={(e) => setProductIdea(e.target.value)}
-            placeholder="e.g., sustainable water bottles, noise-canceling headphones"
-            className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow"
-          />
-          <button
-            onClick={handleGenerateReport}
-            disabled={isLoading}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          >
-            {isLoading ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Analyzing...
-              </>
-            ) : (
-              <>
-                <Brain size={20} className="mr-2" /> Generate Report
-              </>
-            )}
-          </button>
-        </div>
-        {error && <p className="text-red-500 text-sm mt-3 bg-red-100 p-3 rounded-md flex items-center"><AlertCircle size={16} className="mr-2"/>{error}</p>}
-      </div>
-
-      {/* Loading Section */}
-      {isLoading && (
-        <div className="text-center py-10">
-          <div className="animate-pulse">
-            <Zap size={48} className="mx-auto text-indigo-500 mb-4" />
-            <p className="text-lg text-gray-600">Gathering market intelligence... this might take a moment.</p>
+        {/* 1️⃣ Enter Topic */}
+        <section className="bg-indigo-950 p-6 rounded-lg shadow-lg border border-purple-900">
+          <h3 className="text-xl font-semibold text-violet-100 mb-4">
+            Enter Research Topic
+          </h3>
+          <div className="flex gap-4">
+            <input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="e.g., large language models"
+              className="flex-grow p-3 rounded border border-violet-800 bg-gray-900 text-violet-100 placeholder-violet-400 focus:ring-violet-400 focus:border-violet-400"
+            />
+            <button
+              onClick={handleFetch}
+              disabled={isLoading}
+              className="bg-gradient-to-r from-purple-700 to-violet-600 hover:from-violet-700 hover:to-indigo-800 text-white px-6 rounded disabled:opacity-50 flex items-center"
+            >
+              {isLoading ? (
+                <>
+                  <Zap className="animate-spin mr-2" /> Searching…
+                </>
+              ) : (
+                <>
+                  <Brain className="mr-2" /> Fetch Report
+                </>
+              )}
+            </button>
           </div>
-        </div>
-      )}
+          {error && (
+            <p className="mt-3 text-red-400 flex items-center">
+              <AlertCircle className="mr-1" /> {error}
+            </p>
+          )}
+        </section>
 
-      {/* Report Section */}
-      {report && !isLoading && <ReportSection report={report} />}
+        {/* 2️⃣ Research Report */}
+        {reportMd && (
+          <section className="bg-indigo-950 p-6 rounded-lg shadow-lg space-y-4 border border-purple-900">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold text-violet-100">
+                Research Report
+              </h3>
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center space-x-1 bg-violet-800/60 text-violet-200 px-3 py-1 rounded hover:bg-violet-700"
+                >
+                  <ClipboardCopy size={16} />
+                  <span>Copy</span>
+                </button>
+                <button
+                  onClick={handleDownload}
+                  className="flex items-center space-x-1 bg-green-900/70 text-green-200 px-3 py-1 rounded hover:bg-green-800"
+                >
+                  <DownloadCloud size={16} />
+                  <span>Download</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <p className="text-sm text-violet-400">
+              {wordCount.toLocaleString()} words • {readTime} min read
+            </p>
+
+            {/* Markdown Rendering */}
+            <article className="prose prose-invert prose-violet max-w-none bg-indigo-900/70 rounded p-4 text-violet-100">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {reportMd}
+              </ReactMarkdown>
+            </article>
+          </section>
+        )}
+
+        {/* 3️⃣ Chat */}
+        <section
+          className={`bg-indigo-950 p-6 rounded-lg shadow-lg border border-purple-900 ${
+            !chatEnabled ? "opacity-50" : ""
+          }`}
+        >
+          <h3 className="text-xl font-semibold text-violet-100 mb-4">
+            Chat with Agent
+          </h3>
+          <div className="flex gap-4 mb-4">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              disabled={!chatEnabled}
+              placeholder={chatEnabled ? "Ask follow-up…" : "Fetch report first"}
+              className="flex-grow p-3 rounded border border-violet-800 bg-gray-900 text-violet-100 placeholder-violet-400 focus:ring-violet-400 focus:border-violet-400"
+            />
+            <button
+              onClick={handleChat}
+              disabled={!chatEnabled || !chatInput.trim()}
+              className="bg-gradient-to-r from-green-700 to-green-800 hover:from-green-800 hover:to-green-900 text-white px-6 rounded flex items-center disabled:opacity-50"
+            >
+              <MessageCircle className="mr-2" /> Send
+            </button>
+          </div>
+          <div className="space-y-4 max-h-64 overflow-auto">
+            {chatLog.map((entry, i) => (
+              <div key={i} className="space-y-1">
+                <p className="text-violet-100">
+                  <strong>You:</strong> {entry.question}
+                </p>
+                <p className="text-violet-300 ml-4">
+                  <strong>Agent:</strong> {entry.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
     </div>
   );
-};
-
-export default DashboardPage;
+}

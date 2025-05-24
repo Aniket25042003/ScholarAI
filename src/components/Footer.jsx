@@ -1,10 +1,12 @@
-const Footer = () => (
-  <footer className="bg-gray-800 text-white py-10">
-    <div className="container mx-auto px-6 text-center">
-      <p>&copy; {new Date().getFullYear()} MarketMinds. All rights reserved.</p>
-      <p className="text-sm text-gray-400">Empowering Your Entrepreneurial Journey.</p>
-    </div>
-  </footer>
-);
-
-export default Footer;
+export default function Footer() {
+  return (
+    <footer className="bg-indigo-950 border-t border-purple-900 text-violet-300 py-8">
+      <div className="container mx-auto text-center px-6">
+        <p>&copy; {new Date().getFullYear()} ScholarAI. All rights reserved.</p>
+        <p className="text-sm text-violet-400">
+          Streamline your academic research with AI.
+        </p>
+      </div>
+    </footer>
+  );
+}

@@ -1,17 +1,15 @@
-import HeroSection from '../components/HeroSection';
-import FeaturesSection from '../components/FeaturesSection';
-import ExampleOutputSection from '../components/ExampleOutputSection';
-import Footer from '../components/Footer';
+import HeroSection from "../components/HeroSection";
+import FeaturesSection from "../components/FeaturesSection";
+import ExampleOutputSection from "../components/ExampleOutputSection";
+import Footer from "../components/Footer";
 
-const LandingPage = ({ onNavigate }) => {
+export default function LandingPage({ onNavigate }) {
   return (
     <>
-      <HeroSection onNavigate={onNavigate} />
+      <HeroSection />
       <FeaturesSection />
       <ExampleOutputSection />
       <Footer />
     </>
   );
-};
-
-export default LandingPage;
+}

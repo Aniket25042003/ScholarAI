@@ -1,58 +1,53 @@
-// src/components/Navbar.jsx
-import { ShoppingBag, LogIn, LogOut, BookOpen } from 'lucide-react';
-import { useAuthContext } from '../context/AuthContext';
+import { BookOpen, LogIn, LogOut } from "lucide-react";
+import { useAuthContext } from "../context/AuthContext";
 
-const Navbar = ({ onNavigate }) => {
+export default function Navbar({ onNavigate }) {
   const { isLoggedIn, signInWithGoogle, logout } = useAuthContext();
-
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="container mx-auto px-6 py-3 flex justify-between items-center">
+    <nav className="bg-indigo-950 shadow border-b border-purple-900 sticky top-0 z-50">
+      <div className="container mx-auto flex justify-between items-center px-6 py-3">
         <div
           className="flex items-center cursor-pointer"
-          onClick={() => onNavigate(isLoggedIn ? 'dashboard' : 'landing')}
+          onClick={() => onNavigate(isLoggedIn ? "dashboard" : "landing")}
         >
-          <BookOpen className="h-8 w-8 text-indigo-600 mr-2" />
-          <h1 className="text-2xl font-bold text-gray-800">MarketMinds</h1>
+          <BookOpen className="w-8 h-8 text-violet-400 mr-2" />
+          <span className="text-2xl font-bold text-violet-100">ScholarAI</span>
         </div>
         <div className="flex items-center space-x-4">
           {!isLoggedIn ? (
             <>
-              <a
-                href="#features"
-                onClick={e => { e.preventDefault(); onNavigate('landing','features'); }}
-                className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+              <button
+                onClick={() => onNavigate("landing", "features")}
+                className="text-violet-300 hover:text-violet-100"
               >
                 Features
-              </a>
-              <a
-                href="#examples"
-                onClick={e => { e.preventDefault(); onNavigate('landing','examples'); }}
-                className="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+              </button>
+              <button
+                onClick={() => onNavigate("landing", "examples")}
+                className="text-violet-300 hover:text-violet-100"
               >
                 Examples
-              </a>
+              </button>
               <button
                 onClick={signInWithGoogle}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out flex items-center"
+                className="bg-violet-700 hover:bg-violet-800 text-white px-4 py-2 rounded flex items-center"
               >
-                <LogIn size={18} className="mr-2" />
-                Sign in with Google
+                <LogIn className="mr-2" /> Sign In
               </button>
             </>
           ) : (
             <button
-              onClick={() => { logout(); onNavigate('landing'); }}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out flex items-center"
+              onClick={() => {
+                logout();
+                onNavigate("landing");
+              }}
+              className="bg-red-600 text-white px-4 py-2 rounded flex items-center hover:bg-red-700"
             >
-              <LogOut size={18} className="mr-2" />
-              Logout
+              <LogOut className="mr-2" /> Logout
             </button>
           )}
         </div>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}
